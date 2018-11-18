@@ -119,6 +119,22 @@ namespace Utilities
       get_process_grid_columns() const;
 
       /**
+       * Return row of this process in the grid processes grid.
+       *
+       * It's negative for in-active processes.
+       */
+      int
+      get_this_process_row() const;
+
+      /**
+       * Return column of this process in the grid processes grid.
+       *
+       * It's negative for in-active processes.
+       */
+      int
+      get_this_process_column() const;
+
+      /**
        * Send @p count values stored consequently starting at @p value from
        * the process with rank zero to processes which
        * are not in the process grid.
@@ -224,6 +240,19 @@ namespace Utilities
       return mpi_process_is_active;
     }
 
+
+    inline int
+    ProcessGrid::get_this_process_row() const
+    {
+      return this_process_row;
+    }
+
+
+    inline int
+    ProcessGrid::get_this_process_column() const
+    {
+      return this_process_column;
+    }
 
 #  endif // ifndef DOXYGEN
 
