@@ -882,6 +882,13 @@ namespace DoFTools
   make_hanging_node_constraints(const DoFHandlerType &     dof_handler,
                                 AffineConstraints<number> &constraints);
 
+  template <typename DoFHandlerType, typename number>
+  void
+  make_hanging_node_constraints_from_serial(const DoFHandlerType &     dof_handler,
+	                                    const DoFHandlerType &     dof_handler_par,
+	                                    const std::map<dealii::CellId,typename DoFHandlerType::active_cell_iterator> & cellIdToCellIterMapSer,
+                                            AffineConstraints<number> &constraints);
+
   /**
    * This function is used when different variables in a problem are
    * discretized on different grids, where one grid is strictly coarser than
