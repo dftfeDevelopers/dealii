@@ -180,15 +180,45 @@ AffineConstraints<number>::is_consistent_in_parallel(
   for (const auto &kv : received)
     {
       // for each incoming line:
-      for (auto &lineit : kv.second)
+      for (const auto &lineit : kv.second)
         {
-          const ConstraintLine &reference = get_line(lineit.index);
+          const ConstraintLine reference = get_line(lineit.index);
 
+          const double eps=1e-10;
+
+          if (std::abs(lineit.inhomogeneity-reference.inhomogeneity)>eps)
+          {
+              ++inconsistent;
+
+              if (verbose|| true)
+                std::cout << "Proc " << myid << " got line " << lineit.index
+                          << " from " << kv.first << " inhomogeneity "
+                          << lineit.inhomogeneity
+                          << " != " << reference.inhomogeneity << std::endl;
+          }
+          else if (lineit.entries.size() != reference.entries.size())
+          {
+              ++inconsistent;
+          }
+          else
+          {
+	      for (size_type i = 0; i < lineit.entries.size(); ++i)
+	        if (std::abs(lineit.entries[i].second-reference.entries[i].second)>eps
+                    || lineit.entries[i].first!=reference.entries[i].first)
+                {
+                  ++inconsistent;
+		  if (verbose|| true)
+		    std::cout << "Wrong values or indices: " <<lineit.entries[i].second<<" ,  "<<reference.entries[i].second
+				  << std::endl;
+                  break;
+                }
+          }
+          /*
           if (lineit.inhomogeneity != reference.inhomogeneity)
             {
               ++inconsistent;
 
-              if (verbose)
+              if (verbose|| true)
                 std::cout << "Proc " << myid << " got line " << lineit.index
                           << " from " << kv.first << " inhomogeneity "
                           << lineit.inhomogeneity
@@ -197,13 +227,15 @@ AffineConstraints<number>::is_consistent_in_parallel(
           else if (lineit.entries != reference.entries)
             {
               ++inconsistent;
-              if (verbose)
+              if (verbose|| true)
                 std::cout << "Proc " << myid << " got line " << lineit.index
-                          << " from " << kv.first << " wrong values!"
+                          << " from " << kv.first << " with wrong values!"
                           << std::endl;
             }
+          */
         }
     }
+
 
   const unsigned int total =
     Utilities::MPI::sum(inconsistent, mpi_communicator);
